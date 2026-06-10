@@ -69,6 +69,22 @@ async function storeRefreshTokenRedis(userId, tokenHash, expiresAt) {
   await storeRefreshToken(userId, tokenHash, expiresAt);
 }
 
+async function getRefreshTokenRedis(tokenHash) {
+  const redis = await getRedisClient();
+
+  if (redis) {
+    const userId = await redis.get(`refresh_token:${tokenHash}`);
+    return userId ? { user_id: userId } : null;
+  }
+
+  const res = await pool.query(
+    'SELECT * FROM refresh_tokens WHERE token_hash=$1 AND revoked=FALSE AND expires_at>NOW()',
+    [tokenHash]
+  );
+
+  return res.rows[0] || null;
+}
+
 async function revokeRefreshTokenRedis(tokenHash) {
   const redis = await getRedisClient();
   if (redis) {
@@ -107,5 +123,6 @@ module.exports = {
   updateProfile,
   storeRefreshTokenRedis,
   revokeRefreshTokenRedis,
-  revokeAllUserTokensRedis
+  revokeAllUserTokensRedis,
+  getRefreshTokenRedis
 };

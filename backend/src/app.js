@@ -103,11 +103,23 @@ app.addHook('onRequest', async (request) => {
 // Global error handler
 app.setErrorHandler((error, request, reply) => {
   request.log.error(error);
-  reply.status(error.statusCode || 500).send({ error: error.message || 'Internal Server Error' });
+
+  if (error.name === 'ZodError' || Array.isArray(error.issues)) {
+    return reply.status(400).send({
+      error: 'Validation error',
+      details: error.issues || [],
+    });
+  }
+
+  return reply.status(error.statusCode || 500).send({
+    error: error.message || 'Internal Server Error',
+  });
 });
 
 // Cron jobs
-require('./utils/cron').setupCronJobs();
+if (process.env.NODE_ENV !== 'test') {
+  require('./utils/cron').setupCronJobs();
+}
 
 // Start
 const start = async () => {
