@@ -4,7 +4,7 @@ const rbac = require('../../middleware/rbac');
 const { bruteForceCheck } = require('../../middleware/bruteForce');
 const auth = require('../../middleware/auth');
 const { extractRequestInfo } = require('../../utils/audit');
-
+const isProduction = process.env.NODE_ENV === 'production';
 async function routes(fastify) {
   // Register
   fastify.post('/register', { preHandler: [auth, rbac('ADMIN')], schema: { tags: ['Authentication'], description: 'Register a new user (Admin only)' } }, async (req, reply) => {
@@ -23,29 +23,18 @@ async function routes(fastify) {
 
   // Login
   fastify.post('/login', { preHandler: [bruteForceCheck], schema: { tags: ['Authentication'], description: 'Login with email and password' } }, async (req, reply) => {
-    const result = z.object({
-  email: z.string().email(),
-  password: z.string()
-}).safeParse(req.body);
-
-if (!result.success) {
-  return reply.status(400).send({
-    error: result.error.flatten()
-  });
-}
-
-const { email, password } = result.data;
-    const loginResult = await service.login(email, password, req.ip, req.headers['user-agent']);
-    reply.setCookie('refreshToken', loginResult.refreshToken, { httpOnly: true, secure: false, sameSite: 'strict', path: '/api/auth/refresh' });
-    return { accessToken: loginResult.accessToken, refreshToken: loginResult.refreshToken, user: loginResult.user };
-  });
+    const { email, password } = z.object({ email: z.string().email(), password: z.string() }).parse(req.body);
+    const result = await service.login(email, password, req.ip, req.headers['user-agent']);
+    reply.setCookie('refreshToken', result.refreshToken, { httpOnly: true, secure: isProduction, sameSite: 'strict', path: '/api/auth/refresh' });
+    return { accessToken: result.accessToken, refreshToken: result.refreshToken, user: result.user };
+    
 
   // Refresh token
   fastify.post('/refresh', { schema: { tags: ['Authentication'], description: 'Refresh access token' } }, async (req, reply) => {
     const token = req.cookies.refreshToken || req.body.refreshToken;
     if (!token) return reply.status(400).send({ error: 'Refresh token required' });
     const tokens = await service.refreshTokens(token, req.ip);
-    reply.setCookie('refreshToken', tokens.refreshToken, { httpOnly: true, secure: false, sameSite: 'strict', path: '/api/auth/refresh' });
+    reply.setCookie('refreshToken', tokens.refreshToken, { httpOnly: true, secure: isProduction, sameSite: 'strict', path: '/api/auth/refresh' });
     return { accessToken: tokens.accessToken, refreshToken: tokens.refreshToken };
   });
 
