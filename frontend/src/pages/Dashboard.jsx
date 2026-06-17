@@ -45,7 +45,12 @@ const nav = [
   { path: '/notifications', label: 'Notifications', icon: '🔔' },
   { path: '/profile', label: 'Profile', icon: '👤' },
   { path: '/sessions', label: 'Sessions', icon: '🔐' },
-  { path: '/reports', label: 'Reports', icon: '📈', roles: ['ADMIN','SENIOR_TL'] },
+  {
+    path: '/reports',
+    label: 'Reports',
+    icon: '📈',
+    roles: ['ADMIN', 'SENIOR_TL'],
+  },
 ];
 
 const adminNav = [
@@ -98,9 +103,9 @@ export default function Dashboard() {
   }, [dark]);
 
   const visibleNav = nav.filter((n) => {
-  if (n.managerOnly && !isManager) return false;
-  if (n.roles && !n.roles.includes(role)) return false;
-  return true;
+    if (n.managerOnly && !isManager) return false;
+    if (n.roles && !n.roles.includes(role)) return false;
+    return true;
   });
 
   const allItems = [...visibleNav, ...(isAdmin ? adminNav : [])];
