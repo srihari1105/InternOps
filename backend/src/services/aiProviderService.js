@@ -274,7 +274,7 @@ const providerRegistry = {
   },
 };
 
-async function generateAIResponse({ messages,userId }) {
+async function generateAIResponse({ messages, userId }) {
   const payload = { userId, messages };
   const cached = getCachedResponse(payload);
 
