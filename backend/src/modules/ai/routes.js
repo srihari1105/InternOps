@@ -74,6 +74,35 @@ async function routes(fastify) {
       //   });
       // }
 
+      const MAX_MESSAGES = 32;
+      const MAX_MESSAGE_CHARS = 4000;
+      const MAX_TOTAL_CHARS = 32000;
+      if (finalMessages.length > MAX_MESSAGES) {
+        return reply.status(413).send({
+          error: 'Too many messages',
+        });
+      }
+
+      let totalChars = 0;
+
+      for (const msg of finalMessages) {
+        const content = String(msg.content || '');
+
+        if (content.length > MAX_MESSAGE_CHARS) {
+          return reply.status(413).send({
+            error: 'Message exceeds maximum length',
+          });
+        }
+
+        totalChars += content.length;
+      }
+
+      if (totalChars > MAX_TOTAL_CHARS) {
+        return reply.status(413).send({
+          error: 'Prompt too long',
+        });
+      }
+
       if (finalMessages.some((msg) => !msg.content || !msg.content.trim())) {
         return reply.status(400).send({
           error: 'Message content cannot be empty',
