@@ -69,7 +69,7 @@ function ManagerHome({ user }) {
   });
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white p-6">
+    <div className="min-h-screen bg-white-900 text-white p-6">
       <div className="mb-6">
         <h1 className="text-3xl font-extrabold text-white">
           Welcome, {user?.fullName || user?.email} 👋
