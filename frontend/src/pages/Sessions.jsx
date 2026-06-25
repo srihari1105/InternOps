@@ -74,11 +74,16 @@ export default function Sessions() {
         <EmptyState icon="💻" title="No active sessions" />
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          {sessions.map((s) => (
+          {sessions.map((s) => {
+            const expiryDate = new Date(s.expiresAt)
+            const isValidExpiry =
+              s.expiresAt && !isNaN(expiryDate.getTime())
+
+            return (
             <Card
-              key={s.sessionId}
-              className="p-4 flex items-center gap-3 card-hover"
-            >
+                key={s.sessionId}
+                className="p-4 flex items-center gap-3 card-hover"
+              >
               <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-slate-600 to-slate-800 text-white flex items-center justify-center text-xl">
                 💻
               </div>
@@ -90,9 +95,15 @@ export default function Sessions() {
                     ? 'N/A'
                     : new Date(s.createdAt).toLocaleString()}
                 </p>
-                <p className="text-xs text-gray-400">
-                  Expires {new Date(s.expiresAt).toLocaleDateString()}
-                </p>
+                {isValidExpiry ? (
+                  <p className="text-xs text-gray-400">
+                    Expires {expiryDate.toLocaleDateString()}
+                  </p>
+                ) : (
+                  <p className="text-xs text-gray-400">
+                    Expires: N/A
+                  </p>
+                )}
               </div>
               <Btn
                 variant="outline"
@@ -101,7 +112,8 @@ export default function Sessions() {
                 Revoke
               </Btn>
             </Card>
-          ))}
+            )
+          })}
         </div>
       )}
     </div>
