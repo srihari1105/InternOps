@@ -121,6 +121,18 @@ async function routes(fastify) {
             errMessage: `You can only add members below your own role (${managerRole})`,
           };
         }
+        if (req.user.role !== 'ADMIN' && data.department_id !== undefined) {
+          const { rows: mgRows } = await client.query(
+            'SELECT department_id FROM users WHERE id = $1 AND deleted_at IS NULL',
+            [managerId]
+          );
+          const mgDept = mgRows[0]?.department_id;
+          if (mgDept && data.department_id !== mgDept)
+            return {
+              errStatus: 403,
+              errMessage: 'You can only add members to your own department',
+            };
+        }
 
         data.email = data.email.trim().toLowerCase();
 
