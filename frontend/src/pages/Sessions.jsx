@@ -75,44 +75,41 @@ export default function Sessions() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {sessions.map((s) => {
-            const expiryDate = new Date(s.expiresAt)
-            const isValidExpiry =
-              s.expiresAt && !isNaN(expiryDate.getTime())
+            const expiryDate = new Date(s.expiresAt);
+            const isValidExpiry = s.expiresAt && !isNaN(expiryDate.getTime());
 
             return (
-            <Card
+              <Card
                 key={s.sessionId}
                 className="p-4 flex items-center gap-3 card-hover"
               >
-              <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-slate-600 to-slate-800 text-white flex items-center justify-center text-xl">
-                💻
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="font-medium text-gray-800 text-sm">Session</p>
-                <p className="text-xs text-gray-500">
-                  Started{' '}
-                  {s.createdAt === 'N/A'
-                    ? 'N/A'
-                    : new Date(s.createdAt).toLocaleString()}
-                </p>
-                {isValidExpiry ? (
-                  <p className="text-xs text-gray-400">
-                    Expires {expiryDate.toLocaleDateString()}
+                <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-slate-600 to-slate-800 text-white flex items-center justify-center text-xl">
+                  💻
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-medium text-gray-800 text-sm">Session</p>
+                  <p className="text-xs text-gray-500">
+                    Started{' '}
+                    {s.createdAt === 'N/A'
+                      ? 'N/A'
+                      : new Date(s.createdAt).toLocaleString()}
                   </p>
-                ) : (
-                  <p className="text-xs text-gray-400">
-                    Expires: N/A
-                  </p>
-                )}
-              </div>
-              <Btn
-                variant="outline"
-                onClick={() => revokeMut.mutate(s.sessionId)}
-              >
-                Revoke
-              </Btn>
-            </Card>
-            )
+                  {isValidExpiry ? (
+                    <p className="text-xs text-gray-400">
+                      Expires {expiryDate.toLocaleDateString()}
+                    </p>
+                  ) : (
+                    <p className="text-xs text-gray-400">Expires: N/A</p>
+                  )}
+                </div>
+                <Btn
+                  variant="outline"
+                  onClick={() => revokeMut.mutate(s.sessionId)}
+                >
+                  Revoke
+                </Btn>
+              </Card>
+            );
           })}
         </div>
       )}
