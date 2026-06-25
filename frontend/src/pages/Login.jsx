@@ -20,7 +20,22 @@ export default function Login() {
       setAuth({ accessToken: data.accessToken, user: data.user });
       navigate('/');
     },
-    onError: (err) => setError(err.response?.data?.error || 'Login failed'),
+    onError: (err) => {
+      if (import.meta.env.DEV) {
+        console.error('Login error:', err);
+      }
+      const message = err.response?.data?.error;
+      if (message === 'Invalid credentials') {
+        setError('Invalid credentials. Please check your email and password.');
+      } else if (
+        message === 'Account temporarily locked due to too many failed attempts. Please try again later.' ||
+        (message && message.toLowerCase().includes('locked'))
+      ) {
+        setError('Account temporarily locked. Please try again later.');
+      } else {
+        setError('Login failed. Please try again later.');
+      }
+    },
   });
 
   const validate = () => {
