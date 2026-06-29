@@ -96,7 +96,7 @@ export default function Sessions() {
                   </p>
                   {isValidExpiry ? (
                     <p className="text-xs text-gray-400">
-                      Expires {expiryDate.toLocaleDateString()}
+                      Expires: {expiryDate.toLocaleDateString()}
                     </p>
                   ) : (
                     <p className="text-xs text-gray-400">Expires: N/A</p>
