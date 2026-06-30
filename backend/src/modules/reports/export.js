@@ -1,4 +1,5 @@
-﻿const auth = require('../../middleware/auth');
+const auth = require('../../middleware/auth');
+const { toSchema } = require('../../utils/schemaHelper');
 const rbac = require('../../middleware/rbac');
 const repo = require('./repository');
 const { z } = require('zod');
@@ -45,6 +46,10 @@ async function routes(fastify) {
           timeWindow: config.rateLimit.timeWindow,
           keyGenerator: (req) => req.user?.id || req.ip,
         },
+      schema: {
+        tags: ['Reports'],
+        description: 'Export attendance as CSV',
+        querystring: toSchema(dateRangeSchema),
       },
     },
     async (req, reply) => {
@@ -73,6 +78,10 @@ async function routes(fastify) {
           timeWindow: config.rateLimit.timeWindow,
           keyGenerator: (req) => req.user?.id || req.ip,
         },
+      schema: {
+        tags: ['Reports'],
+        description: 'Export ratings as CSV',
+        querystring: toSchema(dateRangeSchema),
       },
     },
     async (req, reply) => {
@@ -106,6 +115,9 @@ async function routes(fastify) {
           timeWindow: config.rateLimit.timeWindow,
           keyGenerator: (req) => req.user?.id || req.ip,
         },
+      schema: {
+        tags: ['Reports'],
+        description: 'Export task completion as CSV',
       },
     },
     async (req, reply) => {
