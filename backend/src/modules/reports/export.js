@@ -2,6 +2,7 @@
 const rbac = require('../../middleware/rbac');
 const repo = require('./repository');
 const { z } = require('zod');
+const config = require('../../config');
 
 const dateRangeSchema = z.object({
   from: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'from must be YYYY-MM-DD'),
@@ -36,7 +37,16 @@ function csvCell(value) {
 async function routes(fastify) {
   fastify.get(
     '/attendance-csv',
-    { preHandler: [auth, rbac('ADMIN', 'SENIOR_TL')] },
+    {
+      preHandler: [auth, rbac('ADMIN', 'SENIOR_TL')],
+      config: {
+        rateLimit: {
+          max: config.rateLimit.reportsMax,
+          timeWindow: config.rateLimit.timeWindow,
+          keyGenerator: (req) => req.user?.id || req.ip,
+        },
+      },
+    },
     async (req, reply) => {
       const range = parseDateRange(req.query, reply);
       if (!range) return;
@@ -55,7 +65,16 @@ async function routes(fastify) {
 
   fastify.get(
     '/ratings-csv',
-    { preHandler: [auth, rbac('ADMIN', 'SENIOR_TL')] },
+    {
+      preHandler: [auth, rbac('ADMIN', 'SENIOR_TL')],
+      config: {
+        rateLimit: {
+          max: config.rateLimit.reportsMax,
+          timeWindow: config.rateLimit.timeWindow,
+          keyGenerator: (req) => req.user?.id || req.ip,
+        },
+      },
+    },
     async (req, reply) => {
       const range = parseDateRange(req.query, reply);
       if (!range) return;
@@ -79,7 +98,16 @@ async function routes(fastify) {
 
   fastify.get(
     '/tasks-csv',
-    { preHandler: [auth, rbac('ADMIN', 'SENIOR_TL')] },
+    {
+      preHandler: [auth, rbac('ADMIN', 'SENIOR_TL')],
+      config: {
+        rateLimit: {
+          max: config.rateLimit.reportsMax,
+          timeWindow: config.rateLimit.timeWindow,
+          keyGenerator: (req) => req.user?.id || req.ip,
+        },
+      },
+    },
     async (req, reply) => {
       const data = await repo.taskCompletionStats();
       const csv = ['Task Title,Verified,Pending']

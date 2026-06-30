@@ -71,6 +71,7 @@ module.exports = {
   rateLimit: {
     globalMax: process.env.NODE_ENV === 'test' ? 10000 : 100,
     authMax: process.env.NODE_ENV === 'test' ? 10000 : 50,
+    reportsMax: process.env.NODE_ENV === 'test' ? 10000 : 5,
     timeWindow: '1 minute',
   },
   email: {
